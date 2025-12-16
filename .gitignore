@@ -1,0 +1,26 @@
+build/
+cmake-build-*/
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.sdf
+*.opensdf
+*.vcxproj
+*.vcxproj.filters
+*.xcodeproj
+*.xcworkspace
+Builds/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Plugin builds
+*.vst3
+*.aax
+*.component
+
+# Logs
+*.log
