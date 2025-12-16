@@ -22,5 +22,9 @@ Thumbs.db
 *.aax
 *.component
 
+# Exception: Include compiled binaries in binaries/ directory
+!binaries/*.vst3
+!binaries/*.aax
+
 # Logs
 *.log
