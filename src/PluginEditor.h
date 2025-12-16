@@ -26,6 +26,7 @@ public:
     CompressorPanel(MultiColorCompProcessor& p);
     void resized() override;
     void paint(juce::Graphics& g) override;
+    void updateButtonStates();
 
 private:
     MultiColorCompProcessor& processor;
@@ -42,6 +43,7 @@ public:
     ColorPanel(MultiColorCompProcessor& p);
     void resized() override;
     void paint(juce::Graphics& g) override;
+    void updateButtonStates();
 
 private:
     MultiColorCompProcessor& processor;

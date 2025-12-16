@@ -77,6 +77,20 @@ CompressorPanel::CompressorPanel(MultiColorCompProcessor& p)
     varimuButton.setColour(juce::TextButton::buttonOnColourId, ModernLookAndFeel::cyan);
     addAndMakeVisible(varimuButton);
 
+    // Wire up style buttons to parameter
+    auto* styleParam = processor.getAPVTS().getParameter(ParamIDs::compStyle);
+    vcaButton.onClick = [styleParam]() { styleParam->setValueNotifyingHost(0.0f / 3.0f); };
+    fetButton.onClick = [styleParam]() { styleParam->setValueNotifyingHost(1.0f / 3.0f); };
+    optoButton.onClick = [styleParam]() { styleParam->setValueNotifyingHost(2.0f / 3.0f); };
+    varimuButton.onClick = [styleParam]() { styleParam->setValueNotifyingHost(3.0f / 3.0f); };
+
+    // Set initial button states
+    int currentStyle = (int)(styleParam->getValue() * 3.0f + 0.5f);
+    if (currentStyle == 0) vcaButton.setToggleState(true, juce::dontSendNotification);
+    else if (currentStyle == 1) fetButton.setToggleState(true, juce::dontSendNotification);
+    else if (currentStyle == 2) optoButton.setToggleState(true, juce::dontSendNotification);
+    else if (currentStyle == 3) varimuButton.setToggleState(true, juce::dontSendNotification);
+
     // Create knobs
     thresholdKnob = std::make_unique<ModernKnob>("THRESH", ModernLookAndFeel::cyan);
     thresholdKnob->setParameter(processor.getAPVTS().getParameter(ParamIDs::compThreshold));
@@ -176,6 +190,17 @@ void CompressorPanel::paint(juce::Graphics& g)
                textBounds, juce::Justification::centred);
 }
 
+void CompressorPanel::updateButtonStates()
+{
+    auto* styleParam = processor.getAPVTS().getParameter(ParamIDs::compStyle);
+    int currentStyle = (int)(styleParam->getValue() * 3.0f + 0.5f);
+
+    vcaButton.setToggleState(currentStyle == 0, juce::dontSendNotification);
+    fetButton.setToggleState(currentStyle == 1, juce::dontSendNotification);
+    optoButton.setToggleState(currentStyle == 2, juce::dontSendNotification);
+    varimuButton.setToggleState(currentStyle == 3, juce::dontSendNotification);
+}
+
 // ============================================================================
 // ColorPanel
 // ============================================================================
@@ -207,6 +232,20 @@ ColorPanel::ColorPanel(MultiColorCompProcessor& p)
     clipButton.setRadioGroupId(2);
     clipButton.setColour(juce::TextButton::buttonOnColourId, ModernLookAndFeel::amber);
     addAndMakeVisible(clipButton);
+
+    // Wire up type buttons to parameter
+    auto* typeParam = processor.getAPVTS().getParameter(ParamIDs::colorType);
+    tapeButton.onClick = [typeParam]() { typeParam->setValueNotifyingHost(0.0f / 3.0f); };
+    tubeButton.onClick = [typeParam]() { typeParam->setValueNotifyingHost(1.0f / 3.0f); };
+    transButton.onClick = [typeParam]() { typeParam->setValueNotifyingHost(2.0f / 3.0f); };
+    clipButton.onClick = [typeParam]() { typeParam->setValueNotifyingHost(3.0f / 3.0f); };
+
+    // Set initial button states
+    int currentType = (int)(typeParam->getValue() * 3.0f + 0.5f);
+    if (currentType == 0) tapeButton.setToggleState(true, juce::dontSendNotification);
+    else if (currentType == 1) tubeButton.setToggleState(true, juce::dontSendNotification);
+    else if (currentType == 2) transButton.setToggleState(true, juce::dontSendNotification);
+    else if (currentType == 3) clipButton.setToggleState(true, juce::dontSendNotification);
 
     // Create knobs
     driveKnob = std::make_unique<ModernKnob>("DRIVE", ModernLookAndFeel::amber);
@@ -288,6 +327,17 @@ void ColorPanel::paint(juce::Graphics& g)
 
     g.setColour(ModernLookAndFeel::amber.withAlpha(0.6f));
     g.strokePath(curve, juce::PathStrokeType(2.0f));
+}
+
+void ColorPanel::updateButtonStates()
+{
+    auto* typeParam = processor.getAPVTS().getParameter(ParamIDs::colorType);
+    int currentType = (int)(typeParam->getValue() * 3.0f + 0.5f);
+
+    tapeButton.setToggleState(currentType == 0, juce::dontSendNotification);
+    tubeButton.setToggleState(currentType == 1, juce::dontSendNotification);
+    transButton.setToggleState(currentType == 2, juce::dontSendNotification);
+    clipButton.setToggleState(currentType == 3, juce::dontSendNotification);
 }
 
 // ============================================================================
@@ -393,8 +443,18 @@ MultiColorCompEditor::MultiColorCompEditor(MultiColorCompProcessor& p)
     intensityKnob.setParameter(processor.getAPVTS().getParameter(ParamIDs::intensityMacro));
     addAndMakeVisible(intensityKnob);
 
-    routingButton.setButtonText("ROUTE A");
+    // Wire up routing button
+    auto* routingParam = processor.getAPVTS().getParameter(ParamIDs::routing);
     routingButton.setColour(juce::TextButton::buttonColourId, ModernLookAndFeel::darkCard);
+    routingButton.onClick = [this, routingParam]() {
+        float currentValue = routingParam->getValue();
+        float newValue = (currentValue < 0.5f) ? 1.0f : 0.0f;
+        routingParam->setValueNotifyingHost(newValue);
+        routingButton.setButtonText(newValue < 0.5f ? "S→C→H" : "C→H→S");
+    };
+
+    // Set initial routing button text
+    routingButton.setButtonText(routingParam->getValue() < 0.5f ? "S→C→H" : "C→H→S");
     addAndMakeVisible(routingButton);
 
     addAndMakeVisible(compressorPanel);
@@ -499,6 +559,14 @@ void MultiColorCompEditor::timerCallback()
     outputLevelL = processor.getOutputLevel(0);
     outputLevelR = processor.getOutputLevel(1);
     grLevel = processor.getGainReduction();
+
+    // Update button states (for automation)
+    compressorPanel.updateButtonStates();
+    colorPanel.updateButtonStates();
+
+    // Update routing button text
+    auto* routingParam = processor.getAPVTS().getParameter(ParamIDs::routing);
+    routingButton.setButtonText(routingParam->getValue() < 0.5f ? "S→C→H" : "C→H→S");
 
     compressorPanel.repaint();
     repaint();
