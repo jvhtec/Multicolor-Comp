@@ -97,6 +97,18 @@ if(APPLE)
             XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY $ENV{APPLE_SIGNING_IDENTITY}
         )
     endif()
+elseif(WIN32)
+    # Windows-specific settings
+    target_compile_definitions(MultiColorComp PRIVATE
+        _CRT_SECURE_NO_WARNINGS
+        NOMINMAX
+    )
+
+    # Use static runtime for better compatibility
+    if(MSVC)
+        set_property(TARGET MultiColorComp PROPERTY
+            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    endif()
 endif()
 
 # AAX SDK path configuration

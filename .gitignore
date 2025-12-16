@@ -1,5 +1,10 @@
 build/
+build_macos/
+build_windows/
+build_windows_cross/
+build_linux/
 cmake-build-*/
+_deps/
 .vs/
 .vscode/
 .idea/

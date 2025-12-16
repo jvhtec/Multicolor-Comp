@@ -97,38 +97,104 @@ cmake --build . --config Release --parallel 8
 
 ## Building on Windows
 
-### VST3
+### Quick Build (VST3)
+
+Using the provided build script:
 
 ```cmd
-mkdir build_win
-cd build_win
+build_windows.bat
+```
+
+This automatically detects Visual Studio and builds VST3 + Standalone formats.
+
+### Quick Build with AAX
+
+```cmd
+set AAX_SDK_PATH=C:\SDKs\AAX_SDK
+build_windows.bat
+```
+
+### Manual Build - Visual Studio 2022
+
+```cmd
+mkdir build_windows
+cd build_windows
+
+REM Configure
+cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release
+
+REM Build
+cmake --build . --config Release --parallel
+
+REM Built plugins are in:
+REM build_windows\MultiColorComp_artefacts\Release\VST3\Multi-Color Comp.vst3
+REM build_windows\MultiColorComp_artefacts\Release\Standalone\Multi-Color Comp.exe
+```
+
+### Manual Build - Visual Studio 2019
+
+```cmd
+mkdir build_windows
+cd build_windows
 
 REM Configure
 cmake .. -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release
 
 REM Build
 cmake --build . --config Release --parallel
-
-REM Built plugin is in:
-REM build_win\MultiColorComp_artefacts\Release\VST3\Multi-Color Comp.vst3
 ```
 
-### AAX on Windows
+### AAX Build on Windows
 
-```cmd
-REM Set AAX SDK path
-set AAX_SDK_PATH=C:\SDKs\AAX_SDK
+1. **Set AAX SDK path**
+   ```cmd
+   set AAX_SDK_PATH=C:\SDKs\AAX_SDK
+   ```
 
-mkdir build_win
-cd build_win
+2. **Build**
+   ```cmd
+   build_windows.bat
+   ```
 
-cmake .. -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DAAX_SDK_PATH=%AAX_SDK_PATH%
+   Or manually:
+   ```cmd
+   mkdir build_windows
+   cd build_windows
+   cmake .. -G "Visual Studio 17 2022" -A x64 -DAAX_SDK_PATH=%AAX_SDK_PATH%
+   cmake --build . --config Release --parallel
+   ```
 
-cmake --build . --config Release --parallel
+3. **Sign the AAX plugin (required for Pro Tools)**
 
-REM Sign the AAX plugin (required)
-wraptool sign --account "your-account@email.com" --password "your-password" ...
+   AAX plugins must be signed using PACE wraptool (included in AAX SDK):
+
+   ```cmd
+   cd build_windows\MultiColorComp_artefacts\Release\AAX
+
+   wraptool sign ^
+       --verbose ^
+       --account "your-account@email.com" ^
+       --password "your-password" ^
+       --wcguid "your-wcguid" ^
+       --keyfile "path\to\your-key.p12" ^
+       --keypassword "key-password" ^
+       --in "Multi-Color Comp.aaxplugin" ^
+       --out "Multi-Color Comp-signed.aaxplugin"
+   ```
+
+### Cross-Compilation from Linux
+
+For Linux users who want to build Windows binaries:
+
+```bash
+# Install MinGW (Ubuntu/Debian)
+sudo apt install mingw-w64 cmake
+
+# Build
+./build_windows.sh
 ```
+
+This creates Windows x64 binaries using MinGW-w64 cross-compiler.
 
 ## Building on Linux
 

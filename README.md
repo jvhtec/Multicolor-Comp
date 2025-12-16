@@ -2,7 +2,7 @@
 
 A professional multi-format audio plugin combining compression, harmonic saturation, and adaptive resonance control.
 
-**Formats:** VST3, AU (macOS), AAX (Pro Tools)
+**Formats:** VST3 (Windows/macOS/Linux), AU (macOS), AAX (Windows/macOS), Standalone (Windows/macOS/Linux)
 
 ## Features
 

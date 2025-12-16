@@ -11,7 +11,7 @@ This directory contains pre-compiled plugin binaries for Multi-Color Comp.
 - **Build:** Release with optimizations
 
 ### macOS Builds (VST3 + AU + AAX)
-To build for macOS, you must compile on a Mac:
+To build for macOS, compile on a Mac:
 
 ```bash
 # Quick build (VST3 + AU)
@@ -26,6 +26,28 @@ export AAX_SDK_PATH=~/SDKs/AAX_SDK
 - **VST3:** Universal binary (Apple Silicon + Intel)
 - **AU:** Audio Unit (macOS native format)
 - **AAX:** Pro Tools format (requires AAX SDK + code signing)
+
+### Windows Builds (VST3 + AAX)
+To build for Windows:
+
+```cmd
+REM Quick build (VST3 + Standalone)
+build_windows.bat
+
+REM Build with AAX (requires AAX SDK from Avid)
+set AAX_SDK_PATH=C:\SDKs\AAX_SDK
+build_windows.bat
+```
+
+**Windows Output:**
+- **VST3:** Windows x64 plugin
+- **Standalone:** Standalone .exe application
+- **AAX:** Pro Tools format (requires AAX SDK + PACE code signing)
+
+**Cross-compile from Linux:**
+```bash
+./build_windows.sh  # Requires MinGW-w64
+```
 
 See [BUILD_INSTRUCTIONS.md](../BUILD_INSTRUCTIONS.md) for detailed instructions.
 
@@ -54,6 +76,22 @@ cp -r "Multi-Color Comp.component" ~/Library/Audio/Plug-Ins/Components/
 ```bash
 sudo cp -r "Multi-Color Comp.aaxplugin" /Library/Application\ Support/Avid/Audio/Plug-Ins/
 ```
+
+### Windows VST3
+```cmd
+xcopy /E /I "Multi-Color Comp.vst3" "%COMMONPROGRAMFILES%\VST3\Multi-Color Comp.vst3"
+```
+
+Or manually copy to:
+- System: `C:\Program Files\Common Files\VST3\`
+- User: `C:\Users\<username>\AppData\Local\Programs\Common\VST3\`
+
+### Windows AAX (Pro Tools)
+```cmd
+xcopy /E /I "Multi-Color Comp.aaxplugin" "%COMMONPROGRAMFILES%\Avid\Audio\Plug-Ins\Multi-Color Comp.aaxplugin"
+```
+
+**Note:** AAX plugins must be signed to run in Pro Tools.
 
 ## Plugin Information
 
