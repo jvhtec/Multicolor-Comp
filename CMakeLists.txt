@@ -45,12 +45,15 @@ target_sources(MultiColorComp PRIVATE
     src/dsp/ColorModule.cpp
     src/dsp/SootheModule.cpp
     src/dsp/RouterModule.cpp
+    src/ui/ModernLookAndFeel.cpp
+    src/ui/ModernKnob.cpp
 )
 
 # Include directories
 target_include_directories(MultiColorComp PRIVATE
     src
     src/dsp
+    src/ui
 )
 
 # JUCE modules
