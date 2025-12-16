@@ -9,12 +9,22 @@ This directory contains pre-compiled plugin binaries for Multi-Color Comp.
 - **Size:** 4.0 MB
 - **Platform:** Linux x86_64
 - **Build:** Release with optimizations
+- **Architectures:** x86_64
+
+### Standalone (Linux x86_64)
+- **File:** `Standalone/Multi-Color Comp`
+- **Size:** 4.4 MB
+- **Platform:** Linux x86_64
+- **Build:** Release with optimizations
+- **Type:** Standalone executable (no DAW required)
 
 ### macOS Builds (VST3 + AU + AAX)
-To build for macOS, compile on a Mac:
+⚠️ **macOS binaries must be built on a Mac.** Cross-compilation from Linux is not reliable for JUCE plugins due to framework dependencies and code signing requirements.
+
+To build for macOS on a Mac:
 
 ```bash
-# Quick build (VST3 + AU)
+# Quick build (VST3 + AU + Standalone)
 ./build_macos.sh
 
 # Build with AAX (requires AAX SDK from Avid)
@@ -26,10 +36,12 @@ export AAX_SDK_PATH=~/SDKs/AAX_SDK
 - **VST3:** Universal binary (Apple Silicon + Intel)
 - **AU:** Audio Unit (macOS native format)
 - **AAX:** Pro Tools format (requires AAX SDK + code signing)
+- **Standalone:** Universal app bundle
 
-### Windows Builds (VST3 + AAX)
-To build for Windows:
+### Windows Builds (VST3 + AAX + Standalone)
+⚠️ **Note:** Windows binaries built via MinGW cross-compilation may have compatibility issues. For production use, build natively on Windows using Visual Studio.
 
+**Build on Windows:**
 ```cmd
 REM Quick build (VST3 + Standalone)
 build_windows.bat
@@ -39,15 +51,19 @@ set AAX_SDK_PATH=C:\SDKs\AAX_SDK
 build_windows.bat
 ```
 
+**Cross-compile from Linux (experimental):**
+```bash
+# Install MinGW-w64 first
+sudo apt install mingw-w64
+
+# Build
+./build_windows.sh
+```
+
 **Windows Output:**
 - **VST3:** Windows x64 plugin
 - **Standalone:** Standalone .exe application
 - **AAX:** Pro Tools format (requires AAX SDK + PACE code signing)
-
-**Cross-compile from Linux:**
-```bash
-./build_windows.sh  # Requires MinGW-w64
-```
 
 See [BUILD_INSTRUCTIONS.md](../BUILD_INSTRUCTIONS.md) for detailed instructions.
 
@@ -60,6 +76,15 @@ cp -r "Multi-Color Comp.vst3" ~/.vst3/
 
 # Or system-wide
 sudo cp -r "Multi-Color Comp.vst3" /usr/lib/vst3/
+```
+
+### Linux Standalone
+```bash
+# Run directly (no DAW required)
+./Standalone/"Multi-Color Comp"
+
+# Or copy to /usr/local/bin for system-wide access
+sudo cp Standalone/"Multi-Color Comp" /usr/local/bin/multicolor-comp
 ```
 
 ### macOS VST3
