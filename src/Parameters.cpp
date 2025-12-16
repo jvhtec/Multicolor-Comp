@@ -22,6 +22,33 @@ bool Parameters::getBoolValue(const juce::String& paramID) const
     return getValue(paramID) > 0.5f;
 }
 
+float Parameters::getModulatedThreshold() const
+{
+    float threshold = getValue(ParamIDs::compThreshold);
+    float intensity = getValue(ParamIDs::intensityMacro) / 100.0f;  // 0-1
+
+    // Intensity lowers threshold by up to 10dB (more compression)
+    return threshold - (intensity * 10.0f);
+}
+
+float Parameters::getModulatedMakeup() const
+{
+    float makeup = getValue(ParamIDs::compMakeup);
+    float intensity = getValue(ParamIDs::intensityMacro) / 100.0f;
+
+    // Intensity adds up to 10dB of makeup gain
+    return makeup + (intensity * 10.0f);
+}
+
+float Parameters::getModulatedDrive() const
+{
+    float drive = getValue(ParamIDs::colorDrive);
+    float intensity = getValue(ParamIDs::intensityMacro) / 100.0f;
+
+    // Intensity increases drive by up to 20dB (more saturation)
+    return drive + (intensity * 20.0f);
+}
+
 juce::AudioProcessorValueTreeState::ParameterLayout Parameters::createParameterLayout()
 {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;

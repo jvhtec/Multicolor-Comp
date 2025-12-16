@@ -16,7 +16,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(JUCE)
 
 # Plugin formats to build
-set(FORMATS VST3)
+set(FORMATS VST3 AAX)
 
 # Main plugin target
 juce_add_plugin(MultiColorComp

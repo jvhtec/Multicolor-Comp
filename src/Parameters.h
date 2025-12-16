@@ -59,6 +59,11 @@ public:
     int getIntValue(const juce::String& paramID) const;
     bool getBoolValue(const juce::String& paramID) const;
 
+    // Intensity macro modulated values
+    float getModulatedThreshold() const;
+    float getModulatedMakeup() const;
+    float getModulatedDrive() const;
+
 private:
     juce::AudioProcessorValueTreeState apvts;
 

@@ -69,12 +69,12 @@ void CompressorModule::process(juce::dsp::AudioBlock<float>& block, const Parame
     }
 
     // Get parameters
-    const float threshold = params.getValue(ParamIDs::compThreshold);
+    const float threshold = params.getModulatedThreshold();  // Modulated by intensity macro
     const float ratio = params.getValue(ParamIDs::compRatio);
     const float attack = params.getValue(ParamIDs::compAttack);
     const float release = params.getValue(ParamIDs::compRelease);
     const float knee = params.getValue(ParamIDs::compKnee);
-    const float makeup = params.getValue(ParamIDs::compMakeup);
+    const float makeup = params.getModulatedMakeup();  // Modulated by intensity macro
     const float mix = params.getValue(ParamIDs::compMix) * 0.01f;  // 0-1
     const float hpfFreq = params.getValue(ParamIDs::compSCHPF);
     const int stereoLink = params.getIntValue(ParamIDs::compStereoLink);

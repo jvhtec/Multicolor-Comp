@@ -10,9 +10,9 @@ void SootheModule::prepare(const juce::dsp::ProcessSpec& spec)
 {
     sampleRate = spec.sampleRate;
 
-    // Set FFT parameters based on quality
-    fftSize = 2048;
-    hopSize = 512;
+    // Set FFT parameters based on quality (will be updated in process())
+    fftSize = 1024;  // Default to Normal
+    hopSize = 256;
     currentQuality = Quality::Normal;
 
     // Create FFT
@@ -50,6 +50,48 @@ void SootheModule::process(juce::dsp::AudioBlock<float>& block, const Parameters
 {
     if (params.getBoolValue(ParamIDs::sootheBypass))
         return;
+
+    // Check if quality mode has changed and reinitialize if needed
+    int quality = params.getIntValue(ParamIDs::sootheQuality);
+    Quality newQuality = (quality == 0) ? Quality::Eco : (quality == 1) ? Quality::Normal : Quality::High;
+
+    if (newQuality != currentQuality)
+    {
+        currentQuality = newQuality;
+
+        // Update FFT size based on quality
+        if (currentQuality == Quality::Eco)
+            fftSize = 512;
+        else if (currentQuality == Quality::Normal)
+            fftSize = 1024;
+        else
+            fftSize = 2048;
+
+        hopSize = fftSize / 4;
+
+        // Recreate FFT and resize buffers
+        fft = std::make_unique<juce::dsp::FFT>(static_cast<int>(std::log2(fftSize)));
+
+        for (auto& state : channelState)
+        {
+            state.inputFIFO.resize(fftSize, 0.0f);
+            state.outputFIFO.resize(fftSize, 0.0f);
+            state.fftData.resize(fftSize * 2, 0.0f);
+            state.ifftData.resize(fftSize * 2, 0.0f);
+            state.window.resize(fftSize);
+            state.magnitudes.resize(fftSize / 2 + 1, 0.0f);
+            state.baseline.resize(fftSize / 2 + 1, 0.0f);
+            state.attenuation.resize(fftSize / 2 + 1, 1.0f);
+            state.resonanceScore.resize(fftSize / 2 + 1, 0.0f);
+            state.overlapBuffer.resize(fftSize, 0.0f);
+
+            createWindow(state.window, fftSize);
+            state.fifoIndex = 0;
+            state.hopCounter = 0;
+        }
+
+        latencySamples = fftSize;
+    }
 
     const int numChannels = std::min(2, static_cast<int>(block.getNumChannels()));
     const int numSamples = static_cast<int>(block.getNumSamples());

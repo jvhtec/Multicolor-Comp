@@ -62,7 +62,7 @@ void ColorModule::process(juce::dsp::AudioBlock<float>& block, const Parameters&
 
     // Get parameters
     const int colorType = params.getIntValue(ParamIDs::colorType);
-    const float drive = params.getValue(ParamIDs::colorDrive) * 0.01f;  // 0-1
+    const float drive = params.getModulatedDrive() * 0.01f;  // Modulated by intensity macro
     const float tone = params.getValue(ParamIDs::colorTone) * 0.01f;   // -0.5 to +0.5
     const float mix = params.getValue(ParamIDs::colorMix) * 0.01f;
     const float output = params.getValue(ParamIDs::colorOutput);
