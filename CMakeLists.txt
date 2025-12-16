@@ -16,7 +16,14 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(JUCE)
 
 # Plugin formats to build
-set(FORMATS VST3 AAX)
+# AAX requires AAX_SDK_PATH to be set
+if(DEFINED AAX_SDK_PATH)
+    set(FORMATS VST3 AU AAX Standalone)
+    message(STATUS "Building with AAX support (AAX SDK found at ${AAX_SDK_PATH})")
+else()
+    set(FORMATS VST3 AU Standalone)
+    message(STATUS "Building without AAX (set AAX_SDK_PATH to enable)")
+endif()
 
 # Main plugin target
 juce_add_plugin(MultiColorComp
@@ -33,6 +40,8 @@ juce_add_plugin(MultiColorComp
     EDITOR_WANTS_KEYBOARD_FOCUS FALSE
     COPY_PLUGIN_AFTER_BUILD TRUE
     VST3_CATEGORIES Fx Dynamics Distortion
+    AU_MAIN_TYPE kAudioUnitType_Effect
+    AAX_CATEGORY AAX_ePlugInCategory_Dynamics
 )
 
 # Source files
@@ -72,6 +81,28 @@ target_link_libraries(MultiColorComp PRIVATE
     juce::juce_recommended_lto_flags
     juce::juce_recommended_warning_flags
 )
+
+# Platform-specific settings
+if(APPLE)
+    # macOS deployment target
+    set_target_properties(MultiColorComp PROPERTIES
+        XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET "10.13"
+        XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++20"
+        XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++"
+    )
+
+    # Code signing (optional, can be set via environment)
+    if(DEFINED ENV{APPLE_SIGNING_IDENTITY})
+        set_target_properties(MultiColorComp PROPERTIES
+            XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY $ENV{APPLE_SIGNING_IDENTITY}
+        )
+    endif()
+endif()
+
+# AAX SDK path configuration
+if(DEFINED AAX_SDK_PATH)
+    juce_set_aax_sdk_path(${AAX_SDK_PATH})
+endif()
 
 # Tests
 enable_testing()
